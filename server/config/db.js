@@ -1,9 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
+// Load environment variables from .env file
+dotenv.config();
 
-function dbconfig(){
-    mongoose.connect(`mongodb+srv://${process.env.DBUSERNAME}:${process.env.DBPASSWORD}@cluster0.knqixdj.mongodb.net/${process.env.COLECTION}?retryWrites=true&w=majority&appName=Cluster0`)
-    .then(() => console.log('Connected!'));
+function dbconfig() {
+    const dbURI = `mongodb+srv://crime:aklogic@cluster0.knqixdj.mongodb.net/${process.env.COLECTION}?retryWrites=true&w=majority&appName=Cluster0`;
+
+    mongoose.connect(dbURI)
+        .then(() => console.log('Connected to MongoDB Atlas!'))
+        .catch((err) => {
+            console.error('Error connecting to MongoDB Atlas:', err);
+        });
 }
 
-module.exports = dbconfig
+export default dbconfig;
