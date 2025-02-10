@@ -1,7 +1,9 @@
-const express = require("express")
-const _ = express.Router()
-const {login} = require("../../controllers/authController.js") 
+import express from 'express';
+import { login } from '../../controllers/authController.js';  // Add the .js extension
+ // Ensure correct path for ES module
 
-_.post("/login", login)
+const _ = express.Router();
 
-module.exports = _
+_.post('/login', login);
+
+export default _;
