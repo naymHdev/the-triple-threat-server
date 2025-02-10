@@ -1,9 +1,18 @@
-import express from "express";
-import api from "./api/index.js"; // Ensure correct path for ES module
+import { Router } from "express";
+import { userRoutes } from "../models/User/user.route.js";
+// Ensure extension matches the file type
 
-const apiRouter = express.Router();
-const baseUrl = process.env.BASEURL || "/api/v1/";
+const router = Router();
 
-apiRouter.use(baseUrl, api);
+const moduleRotes = [
+  {
+    path: "/users",
+    route: userRoutes,
+  },
+];
 
-export default apiRouter;
+moduleRotes.forEach((route) => {
+  router.use(route.path, route.route);
+});
+
+export default router;
