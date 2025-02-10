@@ -1,6 +1,6 @@
-import userModel from '../models/User.js';  // Ensure the path is correct for ES module
+import userModel from "../models/User/user.model.js"; // Ensure the path is correct for ES module
 
-export const login =  async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const users = await userModel.findOne({ email: email });
@@ -18,5 +18,4 @@ export const login =  async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
-}
-
+};
