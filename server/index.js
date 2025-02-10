@@ -1,34 +1,29 @@
-const path = require("path");
-const express = require('express');
-const dbconfig = require("./config/dbconfig.js");
-require('dotenv').config();
+import path from 'path';
+import express from 'express';
+import dbconfig from './config/db.js';
+import dotenv from 'dotenv';  // Change to `import`
+import route from './routes/index.js';  // Adjust import to ES module style
+import cors from 'cors';
+import errorHandler from './middlewares/errorHandler.js';  // Ensure ES module path
 
-const router = require("./routes");
-
-var cors = require('cors');
-const errorHandler = require('./middlewares/errorHandler.js');
+dotenv.config();  // Initialize dotenv
 
 const app = express();
 
-
 dbconfig();
 
-
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-app.use(router);
-
+app.use(route);
 
 app.use(errorHandler);
-
 
 app.listen(8000, () => {
     console.log("Server running on port 8000");
