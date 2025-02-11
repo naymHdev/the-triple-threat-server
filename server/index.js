@@ -4,7 +4,7 @@ import express from "express";
 import dbconfig from "./config/db.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import notFound from "./middlewares/notFound.js";
-import router from "./routes/index.js";
+import router from "./router/index.js";
 // import errorHandler from "./middlewares/errorHandler.js"; // Ensure ES module path
 
 dotenv.config(); // Initialize dotenv
