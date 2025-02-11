@@ -1,17 +1,20 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import path from "path";
 
-// Load environment variables from .env file
-dotenv.config();
+dotenv.config({ path: path.join(process.cwd(), ".env") });
 
-function dbconfig() {
-    const dbURI = `mongodb+srv://crime:aklogic@cluster0.knqixdj.mongodb.net/${process.env.COLECTION}?retryWrites=true&w=majority&appName=Cluster0`;
+const DB_NAME = process.env.DATABASE_NAME;
 
-    mongoose.connect(dbURI)
-        .then(() => console.log('Connected to MongoDB Atlas!'))
-        .catch((err) => {
-            console.error('Error connecting to MongoDB Atlas:', err);
-        });
+const databaseUrl = `mongodb+srv://${process.env.DATABASE_USER}:nEkGeTRFJerYY14c@cluster0.xm8ksdz.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
+async function dbconfig() {
+  try {
+    await mongoose.connect(databaseUrl);
+    console.log("Database connected");
+  } catch (err) {
+    console.log("Error connecting to the database:", err);
+  }
 }
 
 export default dbconfig;
