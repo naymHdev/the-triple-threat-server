@@ -1,9 +1,10 @@
 import { Router } from "express";
-import userRouter from './routes/user.router.js'
 import adminRouter from "./routes/admin.router.js";
+import authRouter from "./routes/auth.router.js";
 import commentRouter from "./routes/comment.router.js";
 import crimeRouter from "./routes/crimeReport.router.js";
 import mediaRouter from "./routes/media.router.js";
+import userRouter from "./routes/user.router.js";
 import voteRouter from "./routes/vote.router.js";
 
 // Ensure extension matches the file type
@@ -11,6 +12,10 @@ import voteRouter from "./routes/vote.router.js";
 const router = Router();
 
 const moduleRotes = [
+  {
+    path: "/auth",
+    route: authRouter,
+  },
   {
     path: "/users",
     route: userRouter,

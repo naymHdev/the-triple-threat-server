@@ -17,16 +17,7 @@ const CrimeReportSchema = new Schema(
     division: {
       type: String,
       required: true,
-      enum: [
-        "Dhaka",
-        "Chattogram",
-        "Khulna",
-        "Barisal",
-        "Sylhet",
-        "Rajshahi",
-        "Rangpur",
-        "Mymensingh",
-      ],
+      enum: divisions,
     },
     district: {
       type: String,
