@@ -6,6 +6,7 @@ import crimeRouter from "./routes/crimeReport.router.js";
 import mediaRouter from "./routes/media.router.js";
 import userRouter from "./routes/user.router.js";
 import voteRouter from "./routes/vote.router.js";
+import crimepost from "./routes/crimepost.js";
 
 // Ensure extension matches the file type
 
@@ -31,6 +32,10 @@ const moduleRotes = [
   {
     path: "/crime-report",
     route: crimeRouter,
+  },
+  {
+    path: "/crime-post",
+    route: crimepost,
   },
   {
     path: "/media",
