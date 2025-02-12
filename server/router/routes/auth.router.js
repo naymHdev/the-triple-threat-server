@@ -1,18 +1,8 @@
-import express from "express";
-import {
-  authLogin,
-  authLogout,
-  authRegister,
-  refreshToken,
-} from "../../controllers/auth.controller.js";
-import { Protected } from "./../../middlewares/authMiddleware.js";
+import express from 'express';
 
-const router = express.Router();
+const router = express.Router()
 
-router.route("/register").post(authRegister);
-router.route("/login").post(authLogin);
-router.route("/logout").get(Protected, authLogout);
-router.route("/refresh-token").get(Protected, refreshToken);
+router.route('/register').post()
 
 
-export default router;
+export default router

@@ -1,35 +1,16 @@
-import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { LoginSchema, RegisterSchema } from "../schema/auth.schema.js";
-import AsyncHandler from "../utils/catchAsync.js";
+import { LoginSchema, RegisterSchema } from "../schema/auth.schema";
+import AsyncHandler from "../utils/catchAsync";
+import UserModel from "./../models/user.model";
 import {
   generateAccessToken,
   generateRefreshToken,
-  verifyToken,
-} from "../utils/jwtToken.js";
-import UserModel from "./../models/user.model.js";
+} from "./../utils/generateToken";
 import sendRespone from "./../utils/SendResponse.js";
-import { ErrorApi } from "../utils/errorResponse.js";
-import { JWT_REFRESH_TOKEN } from "../config/env.config.js";
-
-const accessCookiesOption = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
-  maxAge: 15 * 1000, // 15min
-};
-
-const refreshCookiesOption = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-};
 
 export const authRegister = AsyncHandler(async (req, res) => {
   try {
-    const user = await UserModel.deleteMany()
-    const { name, email, phoneNumber, password, role } = RegisterSchema.parse(
+    const { email, phoneNumber, password, role } = RegisterSchema.parse(
       req.body
     );
 
@@ -44,28 +25,28 @@ export const authRegister = AsyncHandler(async (req, res) => {
 
     if (existingUser)
       return sendRespone(res, {
-    statusCode: StatusCodes.CONFLICT,
-    message: "Email or phone number already exists.",
-  });
-  
-  const newUser = await UserModel.create({
-    name,
-    email,
-    phoneNumber,
-    password,
-    role,
-  });
-  
+        message: "Email or phone number already exists.",
+      });
+
+    const newUser = await UserModel.create({
+      email,
+      phoneNumber,
+      password,
+      role,
+    });
+
     const accessToken = generateAccessToken(newUser.id);
     const refreshToken = generateRefreshToken(newUser.id);
 
-    res.cookie("accessToken", accessToken, accessCookiesOption);
-
-    res.cookie("refreshToken", refreshToken, refreshCookiesOption);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     return sendRespone(res, {
       message: "User registered successfully",
-      statusCode: StatusCodes.OK,
       data: {
         id: newUser.id,
         email: newUser.email,
@@ -75,7 +56,7 @@ export const authRegister = AsyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    if (error instanceof z.ZodError) throw new ErrorApi(StatusCodes.FORBIDDEN , error.message);
+    if (error instanceof z.ZodError) throw new Error(error);
     throw error;
   }
 });
@@ -89,33 +70,32 @@ export const authLogin = AsyncHandler(async (req, res) => {
 
     if (!user)
       return sendRespone(res, {
-        statusCode: StatusCodes.UNAUTHORIZED,
         message: "invalid credentials",
       });
 
     const isValidPassword = await user.matchPassword(password);
     if (!isValidPassword)
       return sendRespone(res, {
-        statusCode: StatusCodes.UNAUTHORIZED,
         message: "invalid credentials",
       });
 
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+    const accessToken = generateAccessToken(newUser.id);
+    const refreshToken = generateRefreshToken(newUser.id);
 
-    res.cookie("accessToken", accessToken);
-
-    res.cookie("refreshToken", refreshToken);
-
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     return sendRespone(res, {
-      message: "User login successfully",
-      statusCode: StatusCodes.OK,
+      message: "User registered successfully",
       data: {
-        id: user.id,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        role: user.phoneNumber,
+        id: newUser.id,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+        role: newUser.phoneNumber,
         accessToken,
       },
     });
@@ -125,78 +105,17 @@ export const authLogin = AsyncHandler(async (req, res) => {
   }
 });
 
-export const authLogout = AsyncHandler(async (req, res) => {
+export const authLogout = AsyncHandler((req, res) => {
   try {
-    const userId = req.user?._id;
-
-    if (!userId) {
-      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized request");
-    }
-
-    const removeToken = await UserModel.findByIdAndUpdate(userId, {
-      refreshToken: "",
-    });
-
-    if (!removeToken) {
-      throw new ErrorApi(status.FORBIDDEN, "Server-side error");
-    }
-
-    // Clear cookies properly
-    res.clearCookie("accessToken", accessCookiesOption);
-    res.clearCookie("refreshToken", accessCookiesOption);
-
-    return sendRespone(res, {
-      message: "Logout successful",
-      statusCode: status.OK,
-    });
   } catch (error) {
     throw error;
   }
 });
 
+
 export const refreshToken = AsyncHandler(async (req, res) => {
-  try {
-    console.log(req.user)
-    const refreshToken = req.cookies?.refreshToken;
-
-    if (!refreshToken) {
-      return sendRespone(res, {
-        statusCode: StatusCodes.FORBIDDEN,
-        message: "Refresh token is missing",
-      });
+    try {
+    } catch (error) {
+      throw error;
     }
-
-    const decoded = verifyToken(refreshToken, JWT_REFRESH_TOKEN);
-    if (!decoded || !decoded._id) {
-      return sendRespone(res, {
-        statusCode: StatusCodes.FORBIDDEN,
-        message: "Invalid refresh token",
-      });
-    }
-
-    const user = await UserModel.findById(decoded._id);
-    if (!user) {
-      return sendRespone(res, {
-        statusCode:  StatusCodes.UNAUTHORIZED,
-        message: "User not found",
-      });
-    }
-
-    // Generate a new access token
-    const newAccessToken = generateAccessToken(user._id);
-
-    // Set new access token in cookies
-    res.cookie("accessToken", newAccessToken, accessCookiesOption);
-
-    return sendRespone(res, {
-      message: "Access token refreshed successfully",
-      statusCode: StatusCodes.OK,
-      data: { accessToken: newAccessToken },
-    });
-  } catch (error) {
-    return sendRespone(res, {
-      statusCode: StatusCodes.FORBIDDEN,
-      message: "Invalid or expired refresh token",
-    });
-  }
-});
+})
