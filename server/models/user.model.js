@@ -27,6 +27,7 @@ const UserSchema = new Schema(
       enum: userRole,
       required: true,
     },
+
     profilePic: String,
     refreshToken: String,
   },
