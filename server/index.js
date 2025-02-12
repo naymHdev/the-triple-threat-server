@@ -15,8 +15,9 @@ const app = express();
 dbconfig();
 
 app.use(cors());
+app.use("/uploads", express.static("uploads"));
 
-app.use(express.json({limit: "10mb"})); // app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" })); // app.use(express.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true })); // body parser
 
 app.use("/api/v1", router);
