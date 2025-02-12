@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 const DB_NAME = process.env.DATABASE_NAME;
 
-const databaseUrl = `mongodb+srv://${process.env.DATABASE_USER}:nEkGeTRFJerYY14c@cluster0.xm8ksdz.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const databaseUrl = `mongodb+srv://${process.env.DATABASE_USER}:nEkGeTRFJerYY14c@cluster0.xm8ksdz.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`;
 
 async function dbconfig() {
   try {
