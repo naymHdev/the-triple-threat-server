@@ -1,10 +1,9 @@
 import bcrypt from "bcryptjs";
 import mongoose, { Schema } from "mongoose";
-import { userRole } from "../constants/index.js";
+import { userRole } from "../constants";
 
 const UserSchema = new Schema(
   {
-    name: String,
     email: {
       type: String,
       required: true,
@@ -26,7 +25,7 @@ const UserSchema = new Schema(
     role: {
       type: String,
       enum: userRole,
-      defult: "Unverified",
+      required: true,
     },
     profilePic: String,
     refreshToken: String,
@@ -36,19 +35,18 @@ const UserSchema = new Schema(
   }
 );
 
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async (next) => {
   if (!this.isModified("password")) return next();
 
   try {
     this.password = await bcrypt.hash(this.password, 10);
-    console.log(this.password);
     next();
   } catch (error) {
     next(error);
   }
 });
 
-UserSchema.pre("findOneAndUpdate", async function (next) {
+UserSchema.pre("findOneAndUpdate", async (next) => {
   const update = this.getUpdate();
   if (!update || !update.password) return next();
 
@@ -61,7 +59,6 @@ UserSchema.pre("findOneAndUpdate", async function (next) {
 });
 
 UserSchema.methods.matchPassword = async function (password) {
-  console.log(password, this.password);
   return await bcrypt.compare(password, this.password);
 };
 

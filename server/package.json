@@ -19,7 +19,7 @@
     "http-status": "^2.1.0",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^4.17.2",
+    "mongodb": "4.0",
     "mongoose": "^8.10.0",
     "mongose": "^0.0.2-security",
     "nodemon": "^3.1.9",

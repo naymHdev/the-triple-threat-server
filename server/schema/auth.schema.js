@@ -1,22 +1,18 @@
 import { z } from "zod";
-import { userRole } from "../constants/index.js";
+import { userRole } from "../constants";
 
 export const RegisterSchema = z.object({
-  name: z.string().nonempty(),
   email: z
     .string()
     .email("Invalid email address")
     .nonempty("Email is required."),
   password: z.string().min(8, "password must be at least 8 characters."),
-  phoneNumber: z.string().min(10, "type valid phone number"),
+	phoneNumber: z.string().min(10, "type valid phone number"),
+  role: z.enum(userRole)
 });
+
 
 export const LoginSchema = z.object({
   identifier: z.string().nonempty("Email or phone are required"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-
-export const PasswordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
+  password: z.string().min(8, "Password must be at least 8 characters")
+})
