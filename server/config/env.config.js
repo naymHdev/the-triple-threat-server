@@ -1,17 +1,3 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-const env = {
-  JWT_ACCESS_TOKEN: process.env.JWT_ACCESS_TOKEN,
-  JWT_ACCESS_TOKEN_EXPIRY: process.env.JWT_ACCESS_TOKEN_EXPIRY,
-  JWT_REFRESH_TOKEN: process.env.JWT_REFRESH_TOKEN,
-  JWT_REFRESH_TOKEN_EXPIRY: process.env.JWT_REFRESH_TOKEN_EXPIRY,
-}
-
-
-export const {
-	JWT_ACCESS_TOKEN,
-	JWT_ACCESS_TOKEN_EXPIRY,
-	JWT_REFRESH_TOKEN,
-	JWT_REFRESH_TOKEN_EXPIRY
-} = env;
