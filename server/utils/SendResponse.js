@@ -4,7 +4,7 @@ const sendRespone = (res, data) => {
     succcess: data?.success,
     message: data?.message,
     data: data?.data,
-    statusCode: data?.statusCode,
+    statusCode: data?.statusCode || 200,
   });
 };
 
