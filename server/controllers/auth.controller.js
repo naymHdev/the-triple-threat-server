@@ -9,6 +9,8 @@ import {
 import sendRespone from "./../utils/SendResponse.js";
 
 export const authRegister = AsyncHandler(async (req, res) => {
+  console.log("req", req.body);
+
   try {
     const { email, phoneNumber, password, role } = RegisterSchema.parse(
       req.body
@@ -40,7 +42,7 @@ export const authRegister = AsyncHandler(async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "development",
       sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -112,10 +114,9 @@ export const authLogout = AsyncHandler((req, res) => {
   }
 });
 
-
 export const refreshToken = AsyncHandler(async (req, res) => {
-    try {
-    } catch (error) {
-      throw error;
-    }
-})
+  try {
+  } catch (error) {
+    throw error;
+  }
+});
