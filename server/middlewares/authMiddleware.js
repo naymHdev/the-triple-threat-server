@@ -3,28 +3,35 @@ import { JWT_ACCESS_TOKEN } from "../config/env.config.js";
 import UserModel from "../models/user.model.js";
 import AsyncHandler from "../utils/catchAsync.js";
 import { ErrorApi } from "../utils/errorResponse.js";
-
 import { verifyToken } from "../utils/jwtToken.js";
-
 
 export const Protected = AsyncHandler(async (req, res, next) => {
   try {
     const cookie = req.cookies.accessToken;
-    const bearer = req.header.authorization.replace("bearer_", "");
+    const bearer =
+      req.headers.authorization?.replace(/^Bearer\s+/i, "") || null;
 
-    if (!cookie && !bearer)
-      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized user");
+    const token = bearer || cookie;
 
-    const decoded = verifyToken(cookie, JWT_ACCESS_TOKEN);
-    if (!decoded || !decoded._id)
-      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized user");
+    if (!token) {
+      throw new ErrorApi(
+        status.UNAUTHORIZED,
+        "Unauthorized: No token provided"
+      );
+    }
+
+    const decoded = verifyToken(token, JWT_ACCESS_TOKEN);
+
+    if (!decoded || !decoded.userId) {
+      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized: Invalid token");
+    }
 
     const user = await UserModel.findById(decoded.userId);
-    if (!user || !user._id)
-      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized user");
 
+    if (!user) {
+      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized: User not found");
+    }
     req.user = user;
-
     next();
   } catch (error) {
     next(error);

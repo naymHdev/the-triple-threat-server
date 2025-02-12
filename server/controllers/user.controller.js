@@ -7,7 +7,11 @@ import sendRespone from "../utils/SendResponse.js";
 export const userGet = AsyncHandler((req, res) => {
   try {
     const user = req.user;
-    return user;
+    console.log(user);
+    return sendRespone(res, {
+      statusCode: 200,
+      data: user,
+    });
   } catch (error) {
     throw error;
   }
@@ -23,8 +27,8 @@ export const changePassword = AsyncHandler(async (req, res) => {
 
     return sendRespone(res, {
       statusCode: StatusCodes.ok,
-      message: "password changed succefully"
-    })
+      message: "password changed succefully",
+    });
   } catch (error) {
     throw error;
   }

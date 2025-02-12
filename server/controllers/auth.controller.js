@@ -127,20 +127,27 @@ export const authLogin = AsyncHandler(async (req, res) => {
 
 export const authLogout = AsyncHandler(async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      throw new ErrorApi(status.UNAUTHORIZED, "Unauthorized request");
+    }
 
     const removeToken = await UserModel.findByIdAndUpdate(userId, {
       refreshToken: "",
     });
 
-    if (!removeToken || !refreshToken._id)
-      throw new ErrorApi(StatusCodes.FORBIDDEN, "Server side error");
+    if (!removeToken) {
+      throw new ErrorApi(status.FORBIDDEN, "Server-side error");
+    }
 
-    cookie.clearCookie("accessToken",accessCookiesOption);
-    cookie.clearCookie("refreshToken", );
+    // Clear cookies properly
+    res.clearCookie("accessToken", accessCookiesOption);
+    res.clearCookie("refreshToken", accessCookiesOption);
 
     return sendRespone(res, {
-      message: "logout successfully",
+      message: "Logout successful",
+      statusCode: status.OK,
     });
   } catch (error) {
     throw error;
@@ -149,26 +156,36 @@ export const authLogout = AsyncHandler(async (req, res) => {
 
 export const refreshToken = AsyncHandler(async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    console.log(req.user)
+    const refreshToken = req.cookies?.refreshToken;
 
-    if (!refreshToken)
+    if (!refreshToken) {
       return sendRespone(res, {
         statusCode: StatusCodes.FORBIDDEN,
         message: "Refresh token is missing",
       });
+    }
 
     const decoded = verifyToken(refreshToken, JWT_REFRESH_TOKEN);
-
-    const user = await UserModel.findById(decoded.id);
-    if (!user)
+    if (!decoded || !decoded._id) {
       return sendRespone(res, {
-        statusCode: StatusCodes.UNAUTHORIZED,
+        statusCode: StatusCodes.FORBIDDEN,
+        message: "Invalid refresh token",
+      });
+    }
+
+    const user = await UserModel.findById(decoded._id);
+    if (!user) {
+      return sendRespone(res, {
+        statusCode:  StatusCodes.UNAUTHORIZED,
         message: "User not found",
       });
+    }
 
     // Generate a new access token
-    const newAccessToken = generateAccessToken(user.id);
+    const newAccessToken = generateAccessToken(user._id);
 
+    // Set new access token in cookies
     res.cookie("accessToken", newAccessToken, accessCookiesOption);
 
     return sendRespone(res, {

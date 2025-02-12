@@ -6,6 +6,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import notFound from "./middlewares/notFound.js";
 import router from "./router/index.js";
 // import errorHandler from "./middlewares/errorHandler.js"; // Ensure ES module path
+import cookieParser  from "cookie-parser";
 
 dotenv.config(); // Initialize dotenv
 const PORT = process.env.PORT | 8080; // Server port
@@ -15,6 +16,8 @@ const app = express();
 dbconfig();
 
 app.use(cors());
+
+app.use(cookieParser())
 
 app.use(express.json({limit: "10mb"})); // app.use(express.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true })); // body parser
