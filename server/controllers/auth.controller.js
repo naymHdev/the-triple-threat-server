@@ -5,10 +5,12 @@ import AsyncHandler from "../utils/catchAsync.js";
 import {
   generateAccessToken,
   generateRefreshToken,
+  verifyToken,
 } from "../utils/jwtToken.js";
 import UserModel from "./../models/user.model.js";
 import sendRespone from "./../utils/SendResponse.js";
 import { ErrorApi } from "../utils/errorResponse.js";
+import { JWT_REFRESH_TOKEN } from "../config/env.config.js";
 
 const accessCookiesOption = {
   httpOnly: true,
@@ -147,7 +149,37 @@ export const authLogout = AsyncHandler(async (req, res) => {
 
 export const refreshToken = AsyncHandler(async (req, res) => {
   try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken)
+      return sendRespone(res, {
+        statusCode: StatusCodes.FORBIDDEN,
+        message: "Refresh token is missing",
+      });
+
+    const decoded = verifyToken(refreshToken, JWT_REFRESH_TOKEN);
+
+    const user = await UserModel.findById(decoded.id);
+    if (!user)
+      return sendRespone(res, {
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: "User not found",
+      });
+
+    // Generate a new access token
+    const newAccessToken = generateAccessToken(user.id);
+
+    res.cookie("accessToken", newAccessToken, accessCookiesOption);
+
+    return sendRespone(res, {
+      message: "Access token refreshed successfully",
+      statusCode: StatusCodes.OK,
+      data: { accessToken: newAccessToken },
+    });
   } catch (error) {
-    throw error;
+    return sendRespone(res, {
+      statusCode: StatusCodes.FORBIDDEN,
+      message: "Invalid or expired refresh token",
+    });
   }
 });
